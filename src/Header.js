@@ -27,7 +27,11 @@ function Header() {
         <SearchIcon className="header_searchIcon" />
       </div>
       <div className="header_nav">
-        <Link onClick={handleAuthentication} to={!user && "/login"}>
+        <Link
+          style={{ textDecoration: "none" }}
+          onClick={handleAuthentication}
+          to={!user && "/login"}
+        >
           <div className="header_option">
             <span className="header_optionLineOne">
               {user ? user.email : "Hello Guest"}
@@ -38,14 +42,18 @@ function Header() {
           </div>
         </Link>
 
-        <div className="header_option">
-          <span className="header_optionLineOne">Returns</span>
-          <span className="header_optionLineTwo">&Orders</span>
-        </div>
+        <Link style={{ textDecoration: "none" }} to="/orders">
+          <div className="header_option">
+            <span className="header_optionLineOne">Returns</span>
+            <span className="header_optionLineTwo">&Orders</span>
+          </div>
+        </Link>
+
         <div className="header_option">
           <span className="header_optionLineOne"> Your</span>
           <span className="header_optionLineTwo">Prime</span>
         </div>
+
         <Link to={"/checkout"}>
           <div className="header_basketOption">
             <ShoppingBasket />

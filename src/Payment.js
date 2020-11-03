@@ -2,18 +2,13 @@ import React, { useState } from "react";
 import CheckoutProduct from "./CheckoutProduct";
 import "./Payment.css";
 import { useStateValue } from "./StateProvider";
-import { Link,useHistory } from "react-router-dom";
-import {
-  CardElement,
-  useElements,
-  useStripe,
-  elements,
-} from "@stripe/react-stripe-js";
+import { Link, useHistory } from "react-router-dom";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import CurrencyFormat from "react-currency-format";
 import { calculateTotal } from "./reducer";
 import { useEffect } from "react";
 import axios from "./axios";
-
+import { db } from "./firebase";
 function Payment() {
   const [{ basket, user }, dispatch] = useStateValue();
   const [error, setError] = useState();
@@ -23,8 +18,8 @@ function Payment() {
   const [clientSecret, setClientSecret] = useState(true);
 
   const stripe = useStripe();
-  const elments = useElements();
-  const history=useHistory();
+  const elements = useElements();
+  const history = useHistory();
 
   useEffect(() => {
     const getClientSecret = async () => {
@@ -50,8 +45,31 @@ function Payment() {
         setSucceeded(true);
         setError(null);
         setProcessing(false);
-        history.replace("/orders");
+        if (paymentIntent?.status === "succeeded") {
+          db.collection("users")
+            .doc(user?.uid)
+            .collection("orders")
+            .doc(paymentIntent.id)
+            .set({
+              basket: basket,
+              amount: paymentIntent.amount,
+              created: paymentIntent.created,
+            });
+          dispatch({
+            type: "EMPTY_BASKET",
+          });
+          history.replace("/orders");
+        } else {
+          setError(error);
+          setProcessing(false);
+          setSucceeded(false);
+        }
       });
+    // .error((error) => {
+    //   setError(error);
+    //   setProcessing(false);
+    //   setSucceeded(false);
+    // });
   };
   const handleChange = (e) => {
     setDisabled(e.empty);
@@ -88,7 +106,7 @@ function Payment() {
           </div>
         </div>
         <div className="payment_section">
-          <div className="payment_method">
+          <div className="payment_title">
             <h3>Payment Method</h3>
           </div>
           <div className="payment_details">

@@ -7,6 +7,7 @@ import Checkout from "./Checkout";
 import Login from "./Login";
 import { useEffect } from "react";
 import { auth } from "./firebase";
+import Orders from "./Orders";
 import { useStateValue } from "./StateProvider";
 import Payment from "./Payment";
 import { loadStripe } from "@stripe/stripe-js";
@@ -40,6 +41,10 @@ function App() {
         <Switch>
           <Route path="/login">
             <Login />
+          </Route>
+          <Route path="/orders">
+            <Header />
+            <Orders />
           </Route>
           <Route exact path="/">
             <Header />
